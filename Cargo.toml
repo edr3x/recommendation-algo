@@ -1,0 +1,12 @@
+[package]
+name = "vehicle-recommendation-algo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dotenvy = "0.15.7"
+reqwest = "0.11.18"
+actix-web = "4.3.1"
+serde_json = "1.0.96"
+serde = { version = "1.0.163", features = ["derive"] }
+sqlx = { version = "0.6.3", features = ["postgres", "runtime-actix-rustls"] }
