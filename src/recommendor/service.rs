@@ -24,7 +24,7 @@ async fn get_recommendations(data: web::Data<AppState>, path: web::Path<String>)
 
 async fn user_history(
     conn: &sqlx::PgPool,
-    userId: String,
+    user_id: String,
 ) -> Result<Vec<VehicleInfo>, Box<dyn std::error::Error>> {
     // let query = r#"SELECT DISTINCT ON (b.\"vehicleId\") v.id, v.thumbnail, v.title, v.rate
     //                 FROM \"Booking\" b
@@ -45,6 +45,8 @@ async fn user_history(
     // let history = sqlx::query_as!(VehicleInfo, test_query)
     //     .fetch_all(conn)
     //     .await?;
+
+    println!("{}", user_id);
 
     let vehicle_test = sqlx::query_as!(
         VehicleInfo,
