@@ -21,13 +21,16 @@ pub enum BookingStatus {
     Completed,
 }
 
+#[derive(Debug)]
+pub enum Gender {
+    Male,
+    Female,
+    Other,
+}
+
 #[derive(sqlx::FromRow, Debug)]
 pub struct Booking {
-    pub id: String,
     pub vehicle: Vehicle,
-    pub start_date: String,
-    pub end_date: String,
-    pub status: BookingStatus,
 }
 
 #[derive(sqlx::FromRow, Serialize, Debug)]
@@ -39,13 +42,28 @@ pub struct Vehicle {
     pub features: String,
 }
 
+pub struct Features {
+    id: i32,
+    color: Option<String>,
+}
+
 #[derive(sqlx::FromRow, Debug)]
 pub struct User {
     pub id: String,
+    pub gender: Option<Gender>,
     pub phone: String,
     pub email: String,
-    pub vehicle: Vec<Vehicle>,
-    pub booking: Vec<Booking>,
+    pub booking: Option<Vec<Booking>>,
+    pub address: Option<Address>,
+}
+
+#[derive(sqlx::FromRow, Debug)]
+pub struct Address {
+    province: String,
+    district: String,
+    municipality: String,
+    city: String,
+    street: Option<String>,
 }
 
 #[derive(sqlx::FromRow, Serialize, Debug)]

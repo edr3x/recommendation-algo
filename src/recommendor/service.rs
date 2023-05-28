@@ -2,7 +2,7 @@ use actix_web::{get, web, HttpResponse, Responder};
 
 use crate::AppState;
 
-use super::models::{ErrorResponse, SuccessResponse, VehicleInfo};
+use super::models::{ErrorResponse, SuccessResponse, User, VehicleInfo};
 
 #[get("/")]
 async fn index() -> impl Responder {
@@ -64,6 +64,54 @@ async fn user_history(
 
     Ok(vehicles)
 }
+
+// FIXME: have to fix this
+// async fn user_data(conn: &sqlx::PgPool) -> Result<Vec<User>, Box<dyn std::error::Error>> {
+//     let users = sqlx::query_as!(
+//         User,
+//         "SELECT
+//             u.id,
+//             u.gender,
+//             a.province,
+//             a.district,
+//             a.municipality,
+//             a.city,
+//             u.phone,
+//             u.email,
+//             v.id AS vehicle_id,
+//             v.title,
+//             v.rate,
+//             v.model,
+//             b_id.id AS brand_id,
+//             b_id.title AS brand_title,
+//             v.category,
+//             f_id.id AS feature_id,
+//             f_id.color,
+//             f_id.\"hasAirbag\",
+//             f_id.\"hasAC\"
+//         FROM
+//             \"User\" u
+//         JOIN
+//             \"Booking\" b ON u.id = b.\"bookedById\"
+//         JOIN
+//             \"Vehicle\" v ON b.\"vehicleId\" = v.id
+//         JOIN
+//             \"Address\" a ON u.id = a.\"userId\"
+//         JOIN
+//             \"Brand\" b_id ON v.\"brandId\" = b_id.id
+//         JOIN
+//             \"VehicleFeature\" f_id ON v.id = f_id.\"vehicleId\"
+//         WHERE
+//             u.\"isProfileUpdated\" = true
+//             AND u.\"isAddressUpdated\" = true
+//             AND u.\"isVerified\" = true
+//     "
+//     )
+//     .fetch_all(conn)
+//     .await?;
+
+//     Ok(users)
+// }
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(index).service(get_recommendations);
