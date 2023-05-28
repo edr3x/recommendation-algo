@@ -10,13 +10,13 @@ struct AppState {
 #[derive(Serialize, Debug)]
 struct NotFound {
     status: bool,
-    message: String,
+    error: String,
 }
 
 async fn not_found() -> impl Responder {
     let response = NotFound {
         status: false,
-        message: "404 Not Found".to_string(),
+        error: "404 Not Found".to_string(),
     };
 
     HttpResponse::NotFound().json(response)
