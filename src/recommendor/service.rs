@@ -2,7 +2,7 @@ use actix_web::{get, web, HttpResponse, Responder};
 
 use crate::AppState;
 
-use super::models::{ErrorResponse, SuccessResponse, User, VehicleInfo};
+use super::models::{ErrorResponse, SuccessResponse, UserData, UserResponse, Vehicle, VehicleInfo};
 
 #[get("/")]
 async fn index() -> impl Responder {
@@ -38,6 +38,25 @@ async fn get_recommendations(data: web::Data<AppState>, path: web::Path<String>)
     })
 }
 
+#[get("/user")]
+async fn get_users() -> impl Responder {
+    let all_user_data = match user_data().await {
+        Ok(data) => data,
+        Err(e) => {
+            println!("Error getting info: {}", e);
+            return HttpResponse::InternalServerError().json(ErrorResponse {
+                success: false,
+                error: e.to_string(),
+            });
+        }
+    };
+
+    HttpResponse::Ok().json(SuccessResponse {
+        success: true,
+        data: all_user_data,
+    })
+}
+
 async fn user_history(
     conn: &sqlx::PgPool,
     user_id: String,
@@ -65,54 +84,26 @@ async fn user_history(
     Ok(vehicles)
 }
 
-// FIXME: have to fix this
-// async fn user_data(conn: &sqlx::PgPool) -> Result<Vec<User>, Box<dyn std::error::Error>> {
-//     let users = sqlx::query_as!(
-//         User,
-//         "SELECT
-//             u.id,
-//             u.gender,
-//             a.province,
-//             a.district,
-//             a.municipality,
-//             a.city,
-//             u.phone,
-//             u.email,
-//             v.id AS vehicle_id,
-//             v.title,
-//             v.rate,
-//             v.model,
-//             b_id.id AS brand_id,
-//             b_id.title AS brand_title,
-//             v.category,
-//             f_id.id AS feature_id,
-//             f_id.color,
-//             f_id.\"hasAirbag\",
-//             f_id.\"hasAC\"
-//         FROM
-//             \"User\" u
-//         JOIN
-//             \"Booking\" b ON u.id = b.\"bookedById\"
-//         JOIN
-//             \"Vehicle\" v ON b.\"vehicleId\" = v.id
-//         JOIN
-//             \"Address\" a ON u.id = a.\"userId\"
-//         JOIN
-//             \"Brand\" b_id ON v.\"brandId\" = b_id.id
-//         JOIN
-//             \"VehicleFeature\" f_id ON v.id = f_id.\"vehicleId\"
-//         WHERE
-//             u.\"isProfileUpdated\" = true
-//             AND u.\"isAddressUpdated\" = true
-//             AND u.\"isVerified\" = true
-//     "
-//     )
-//     .fetch_all(conn)
-//     .await?;
+async fn user_data() -> Result<Vec<UserData>, Box<dyn std::error::Error>> {
+    let endpoint = std::env::var("USER_ENDPOINT").expect("No endpoint provided");
+    let token = std::env::var("USER_TOKEN").expect("No token provided");
 
-//     Ok(users)
-// }
+    let client = reqwest::Client::new();
+
+    let users = client
+        .get(endpoint)
+        .header("Authorization", token)
+        .send()
+        .await?
+        .json::<UserResponse>()
+        .await?
+        .data;
+
+    Ok(users)
+}
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.service(index).service(get_recommendations);
+    cfg.service(index)
+        .service(get_recommendations)
+        .service(get_users);
 }

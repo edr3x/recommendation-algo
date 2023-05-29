@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 pub struct ErrorResponse<T> {
@@ -12,64 +12,73 @@ pub struct SuccessResponse<T> {
     pub data: T,
 }
 
-#[derive(Debug)]
-pub enum BookingStatus {
-    Pending,
-    Active,
-    Cancelled,
-    Rejected,
-    Completed,
-}
-
-#[derive(Debug)]
-pub enum Gender {
-    Male,
-    Female,
-    Other,
-}
-
-#[derive(sqlx::FromRow, Debug)]
-pub struct Booking {
-    pub vehicle: Vehicle,
-}
-
-#[derive(sqlx::FromRow, Serialize, Debug)]
-pub struct Vehicle {
-    pub id: String,
-    pub title: String,
-    pub brand: String,
-    pub model: String,
-    pub features: String,
-}
-
-pub struct Features {
-    id: i32,
-    color: Option<String>,
-}
-
-#[derive(sqlx::FromRow, Debug)]
-pub struct User {
-    pub id: String,
-    pub gender: Option<Gender>,
-    pub phone: String,
-    pub email: String,
-    pub booking: Option<Vec<Booking>>,
-    pub address: Option<Address>,
-}
-
-#[derive(sqlx::FromRow, Debug)]
-pub struct Address {
-    province: String,
-    district: String,
-    municipality: String,
-    city: String,
-    street: Option<String>,
-}
-
 #[derive(sqlx::FromRow, Serialize, Debug)]
 pub struct VehicleInfo {
     pub id: String,
     pub thumbnail: Option<String>,
     pub title: String,
     pub rate: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserResponse {
+    pub success: bool,
+    pub data: Vec<UserData>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserData {
+    pub id: String,
+    pub gender: Option<String>,
+    pub address: Option<Address>,
+    pub email: Option<String>,
+    pub booking: Vec<Booking>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Address {
+    pub province: String,
+    pub district: String,
+    pub municipality: String,
+    pub city: String,
+    pub street: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Booking {
+    #[serde(rename = "Vehicle")]
+    pub vehicle: Vehicle,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Vehicle {
+    pub id: String,
+    pub title: String,
+    pub rate: String,
+    pub model: String,
+    pub brand: Brand,
+    pub category: String,
+    pub features: Features,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Brand {
+    pub id: String,
+    pub title: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Features {
+    pub id: String,
+    pub color: String,
+    pub has_airbag: bool,
+    #[serde(rename = "hasAC")]
+    pub has_ac: bool,
 }
