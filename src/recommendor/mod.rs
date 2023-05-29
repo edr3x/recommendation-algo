@@ -1,2 +1,4 @@
 mod models;
-pub mod service;
+mod service;
+
+pub mod controller;

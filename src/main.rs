@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     HttpServer::new(move || {
         App::new()
             .app_data(app_data.clone())
-            .configure(recommendor::service::config)
+            .configure(recommendor::controller::config)
             .default_service(web::route().to(not_found))
     })
     .bind("127.0.0.1:5050")?
