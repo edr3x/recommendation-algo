@@ -61,9 +61,18 @@ pub struct Vehicle {
     pub title: String,
     pub rate: String,
     pub model: String,
+    pub thumbnail: String,
     pub brand: Brand,
     pub category: String,
     pub features: Features,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct VehicleResponse {
+    pub id: String,
+    pub title: String,
+    pub rate: String,
+    pub thumbnail: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

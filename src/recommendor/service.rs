@@ -192,48 +192,48 @@ pub fn collaborative_filtering_recommendations<'a>(
     }
 }
 
-pub fn content_based_filtering_recommendations<'a>(
-    users: &'a [UserData],
-    target_user_id: &'a str,
-) -> Vec<&'a Vehicle> {
-    let target_user = users.iter().find(|user| user.id == target_user_id);
+// pub fn content_based_filtering_recommendations<'a>(
+//     users: &'a [UserData],
+//     target_user_id: &'a str,
+// ) -> Vec<&'a Vehicle> {
+//     let target_user = users.iter().find(|user| user.id == target_user_id);
 
-    if let Some(user) = target_user {
-        let booked_vehicle_features: Vec<&str> = user
-            .booking
-            .iter()
-            .flat_map(|booking| booking.vehicle.features.color.split(", "))
-            .collect();
+//     if let Some(user) = target_user {
+//         let booked_vehicle_features: Vec<&str> = user
+//             .booking
+//             .iter()
+//             .flat_map(|booking| booking.vehicle.features.color.split(", "))
+//             .collect();
 
-        let mut recommended_vehicles: Vec<&Vehicle> = Vec::new();
-        for user in users {
-            if user.id != target_user_id {
-                for booking in &user.booking {
-                    if booking
-                        .vehicle
-                        .features
-                        .color
-                        .split(", ")
-                        .any(|feature| booked_vehicle_features.contains(&feature))
-                    {
-                        recommended_vehicles.push(&booking.vehicle);
-                    }
-                }
-            }
-        }
-        {
-            let mut set: HashSet<_> = HashSet::new();
-            let mut result = Vec::new();
+//         let mut recommended_vehicles: Vec<&Vehicle> = Vec::new();
+//         for user in users {
+//             if user.id != target_user_id {
+//                 for booking in &user.booking {
+//                     if booking
+//                         .vehicle
+//                         .features
+//                         .color
+//                         .split(", ")
+//                         .any(|feature| booked_vehicle_features.contains(&feature))
+//                     {
+//                         recommended_vehicles.push(&booking.vehicle);
+//                     }
+//                 }
+//             }
+//         }
+//         {
+//             let mut set: HashSet<_> = HashSet::new();
+//             let mut result = Vec::new();
 
-            for vehicle in recommended_vehicles {
-                if set.insert(vehicle.id.clone()) {
-                    result.push(vehicle);
-                }
-            }
+//             for vehicle in recommended_vehicles {
+//                 if set.insert(vehicle.id.clone()) {
+//                     result.push(vehicle);
+//                 }
+//             }
 
-            result
-        }
-    } else {
-        Vec::new()
-    }
-}
+//             result
+//         }
+//     } else {
+//         Vec::new()
+//     }
+// }
