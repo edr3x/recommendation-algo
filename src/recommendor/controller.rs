@@ -1,9 +1,7 @@
 use actix_web::{get, web, HttpResponse, Responder};
 
-use crate::AppState;
-
 use super::models::{ErrorResponse, SuccessResponse, VehicleResponse};
-use super::service::{collaborative_filtering_recommendations, user_data, user_history};
+use super::service::{collaborative_filtering_recommendations, user_data};
 
 #[get("/")]
 async fn index() -> impl Responder {
@@ -13,31 +11,31 @@ async fn index() -> impl Responder {
     })
 }
 
-#[get("/recom/history/{id}")]
-async fn get_recommendations(data: web::Data<AppState>, path: web::Path<String>) -> impl Responder {
-    let history_data = match user_history(&data.db_pool, path.to_string()).await {
-        Ok(data) => data,
-        Err(e) => {
-            println!("Error getting info: {}", e);
-            return HttpResponse::InternalServerError().json(ErrorResponse {
-                success: false,
-                error: e.to_string(),
-            });
-        }
-    };
+// #[get("/recom/history/{id}")]
+// async fn get_recommendations(data: web::Data<AppState>, path: web::Path<String>) -> impl Responder {
+//     let history_data = match user_history(&data.db_pool, path.to_string()).await {
+//         Ok(data) => data,
+//         Err(e) => {
+//             println!("Error getting info: {}", e);
+//             return HttpResponse::InternalServerError().json(ErrorResponse {
+//                 success: false,
+//                 error: e.to_string(),
+//             });
+//         }
+//     };
 
-    if history_data.is_empty() {
-        return HttpResponse::NotFound().json(ErrorResponse {
-            success: false,
-            error: "No recommendations found".to_string(),
-        });
-    }
+//     if history_data.is_empty() {
+//         return HttpResponse::NotFound().json(ErrorResponse {
+//             success: false,
+//             error: "No recommendations found".to_string(),
+//         });
+//     }
 
-    HttpResponse::Ok().json(SuccessResponse {
-        success: true,
-        data: history_data,
-    })
-}
+//     HttpResponse::Ok().json(SuccessResponse {
+//         success: true,
+//         data: history_data,
+//     })
+// }
 
 #[get("/recom/{id}")]
 async fn get_collaborative_filtering_recommendations(path: web::Path<String>) -> impl Responder {
@@ -74,6 +72,5 @@ async fn get_collaborative_filtering_recommendations(path: web::Path<String>) ->
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(index)
-        .service(get_recommendations)
         .service(get_collaborative_filtering_recommendations);
 }

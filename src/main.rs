@@ -3,9 +3,9 @@ use serde::Serialize;
 
 mod recommendor;
 
-struct AppState {
-    db_pool: sqlx::PgPool,
-}
+// struct AppState {
+//     db_pool: sqlx::PgPool,
+// }
 
 #[derive(Serialize, Debug)]
 struct NotFound {
@@ -26,17 +26,17 @@ async fn not_found() -> impl Responder {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().expect("can't find .env file");
 
-    let postgres_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    // let postgres_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    let app_data = web::Data::new(AppState {
-        db_pool: sqlx::PgPool::connect(postgres_url.as_str())
-            .await
-            .expect("Failed to connect to Postgres"),
-    });
+    // let app_data = web::Data::new(AppState {
+    //     db_pool: sqlx::PgPool::connect(postgres_url.as_str())
+    //         .await
+    //         .expect("Failed to connect to Postgres"),
+    // });
 
     HttpServer::new(move || {
         App::new()
-            .app_data(app_data.clone())
+            // .app_data(app_data.clone())
             .configure(recommendor::controller::config)
             .default_service(web::route().to(not_found))
     })

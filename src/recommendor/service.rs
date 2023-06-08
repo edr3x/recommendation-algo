@@ -1,33 +1,33 @@
-use super::models::{UserData, UserResponse, Vehicle, VehicleInfo};
+use super::models::{UserData, UserResponse, Vehicle};
 
 use std::collections::{HashMap, HashSet};
 
-pub async fn user_history(
-    conn: &sqlx::PgPool,
-    user_id: String,
-) -> Result<Vec<VehicleInfo>, Box<dyn std::error::Error>> {
-    let vehicles = sqlx::query_as!(
-        VehicleInfo,
-        "SELECT DISTINCT ON (b.\"vehicleId\") v.id, v.thumbnail, v.title, v.rate
-         FROM \"Booking\" b
-         JOIN \"Vehicle\" v ON b.\"vehicleId\" = v.id
-         WHERE b.\"bookedById\" = $1
-           AND b.\"status\" = 'completed'
-           AND b.\"vehicleId\" IN (
-             SELECT \"vehicleId\"
-             FROM \"Booking\"
-             WHERE \"bookedById\" = $1
-               AND \"status\" = 'completed'
-             GROUP BY \"vehicleId\"
-             HAVING COUNT(\"vehicleId\") > 2
-         )",
-        user_id
-    )
-    .fetch_all(conn)
-    .await?;
+// pub async fn user_history(
+//     conn: &sqlx::PgPool,
+//     user_id: String,
+// ) -> Result<Vec<VehicleInfo>, Box<dyn std::error::Error>> {
+//     let vehicles = sqlx::query_as!(
+//         VehicleInfo,
+//         "SELECT DISTINCT ON (b.\"vehicleId\") v.id, v.thumbnail, v.title, v.rate
+//          FROM \"Booking\" b
+//          JOIN \"Vehicle\" v ON b.\"vehicleId\" = v.id
+//          WHERE b.\"bookedById\" = $1
+//            AND b.\"status\" = 'completed'
+//            AND b.\"vehicleId\" IN (
+//              SELECT \"vehicleId\"
+//              FROM \"Booking\"
+//              WHERE \"bookedById\" = $1
+//                AND \"status\" = 'completed'
+//              GROUP BY \"vehicleId\"
+//              HAVING COUNT(\"vehicleId\") > 2
+//          )",
+//         user_id
+//     )
+//     .fetch_all(conn)
+//     .await?;
 
-    Ok(vehicles)
-}
+//     Ok(vehicles)
+// }
 
 pub async fn user_data() -> Result<Vec<UserData>, Box<dyn std::error::Error>> {
     let endpoint = std::env::var("USER_ENDPOINT").expect("No endpoint provided");
