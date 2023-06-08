@@ -52,7 +52,7 @@ async fn get_collaborative_filtering_recommendations(path: web::Path<String>) ->
         }
     };
 
-    let colab_recoms = collaborative_filtering_recommendations(&all_user_data, &path);
+    let (colab_recoms, _) = collaborative_filtering_recommendations(&all_user_data, &path);
 
     // let content_recoms = content_based_filtering_recommendations(&all_user_data, &path);
 

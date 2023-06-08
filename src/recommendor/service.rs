@@ -64,6 +64,33 @@ fn calculate_user_similarity(target_user: &UserData, other_user: &UserData) -> f
     let target_details = [
         target_user.gender.as_deref().unwrap_or(""),
         {
+            let this = target_user.address.as_ref().map(|address| &address.city);
+            match this {
+                Some(x) => x,
+                None => "",
+            }
+        },
+        {
+            let this = target_user
+                .address
+                .as_ref()
+                .map(|address| &address.municipality);
+            match this {
+                Some(x) => x,
+                None => "",
+            }
+        },
+        {
+            let this = target_user
+                .address
+                .as_ref()
+                .map(|address| &address.district);
+            match this {
+                Some(x) => x,
+                None => "",
+            }
+        },
+        {
             let this = target_user
                 .address
                 .as_ref()
@@ -78,6 +105,30 @@ fn calculate_user_similarity(target_user: &UserData, other_user: &UserData) -> f
 
     let other_details = [
         other_user.gender.as_deref().unwrap_or(""),
+        {
+            let this = other_user.address.as_ref().map(|address| &address.city);
+            match this {
+                Some(x) => x,
+                None => "",
+            }
+        },
+        {
+            let this = other_user
+                .address
+                .as_ref()
+                .map(|address| &address.municipality);
+            match this {
+                Some(x) => x,
+                None => "",
+            }
+        },
+        {
+            let this = other_user.address.as_ref().map(|address| &address.district);
+            match this {
+                Some(x) => x,
+                None => "",
+            }
+        },
         {
             let this = other_user.address.as_ref().map(|address| &address.province);
             match this {
@@ -129,14 +180,19 @@ fn calculate_user_similarity(target_user: &UserData, other_user: &UserData) -> f
             .collect::<Vec<f64>>(),
     );
 
-    // Combine both similarities with equal weights
-    (details_similarity + bookings_similarity) / 2.0
+    let similarity_score = (details_similarity + bookings_similarity) / 2.0;
+
+    if similarity_score > 0.4 {
+        similarity_score
+    } else {
+        0.0
+    }
 }
 
 pub fn collaborative_filtering_recommendations<'a>(
     users: &'a [UserData],
     target_user_id: &'a str,
-) -> Vec<&'a Vehicle> {
+) -> (Vec<&'a Vehicle>, HashMap<&'a str, f64>) {
     let target_user = users.iter().find(|user| user.id == target_user_id);
 
     if let Some(user) = target_user {
@@ -149,7 +205,19 @@ pub fn collaborative_filtering_recommendations<'a>(
 
             let similarity = calculate_user_similarity(user, other_user);
             user_similarities.insert(other_user.id.as_str(), similarity);
+
+            let keys_to_remove: Vec<&str> = user_similarities
+                .iter()
+                .filter(|(_, &value)| value == 0.0)
+                .map(|(&key, _)| key)
+                .collect();
+
+            for key in keys_to_remove {
+                user_similarities.remove(key);
+            }
         }
+
+        println!("User similarities: {:?}", user_similarities);
 
         let similar_users: Vec<&UserData> = users
             .iter()
@@ -185,10 +253,10 @@ pub fn collaborative_filtering_recommendations<'a>(
                     result.push(vehicle);
                 }
             }
-            result
+            (result, user_similarities)
         }
     } else {
-        Vec::new()
+        (Vec::new(), HashMap::new())
     }
 }
 
