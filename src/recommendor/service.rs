@@ -1,6 +1,8 @@
+use std::collections::{HashMap, HashSet};
+
 use super::models::{UserData, UserResponse, Vehicle};
 
-use std::collections::{HashMap, HashSet};
+const USER_DATA_API: &str = "http://localhost:8080/api/v1/userdata";
 
 // pub async fn user_history(
 //     conn: &sqlx::PgPool,
@@ -30,14 +32,10 @@ use std::collections::{HashMap, HashSet};
 // }
 
 pub async fn user_data() -> Result<Vec<UserData>, Box<dyn std::error::Error>> {
-    let endpoint = std::env::var("USER_ENDPOINT").expect("No endpoint provided");
-    let token = std::env::var("USER_TOKEN").expect("No token provided");
-
     let client = reqwest::Client::new();
 
     let users = client
-        .get(endpoint)
-        .header("Authorization", token)
+        .get(USER_DATA_API)
         .send()
         .await?
         .json::<UserResponse>()

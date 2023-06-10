@@ -24,7 +24,7 @@ async fn not_found() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    dotenvy::dotenv().expect("can't find .env file");
+    // dotenvy::dotenv().expect("can't find .env file");
 
     // let postgres_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
@@ -40,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .configure(recommendor::controller::config)
             .default_service(web::route().to(not_found))
     })
-    .bind("127.0.0.1:5050")?
+    .bind(("0.0.0.0", 5050))?
     .run()
     .await?;
 

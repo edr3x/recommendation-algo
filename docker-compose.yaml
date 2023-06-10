@@ -1,0 +1,7 @@
+version: '3.9'
+
+services:
+  algo_service:
+    build: .
+    ports:
+      - 5050:5050
