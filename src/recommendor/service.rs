@@ -204,15 +204,7 @@ pub fn collaborative_filtering_recommendations<'a>(
             let similarity = calculate_user_similarity(user, other_user);
             user_similarities.insert(other_user.id.as_str(), similarity);
 
-            let keys_to_remove: Vec<&str> = user_similarities
-                .iter()
-                .filter(|(_, &value)| value == 0.0)
-                .map(|(&key, _)| key)
-                .collect();
-
-            for key in keys_to_remove {
-                user_similarities.remove(key);
-            }
+            user_similarities.retain(|_, &mut value| value != 0.0);
         }
 
         println!("User similarities: {:?}", user_similarities);

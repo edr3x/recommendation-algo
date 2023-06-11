@@ -70,7 +70,44 @@ async fn get_collaborative_filtering_recommendations(path: web::Path<String>) ->
     })
 }
 
+#[derive(serde::Serialize)]
+struct UserStruct {
+    id: String,
+    similarity: f64,
+}
+
+#[get("/similaruser/{id}")]
+async fn similar_user(path: web::Path<String>) -> impl Responder {
+    let all_user_data = match user_data().await {
+        Ok(data) => data,
+        Err(e) => {
+            println!("Error getting info: {}", e);
+            return HttpResponse::InternalServerError().json(ErrorResponse {
+                success: false,
+                error: e.to_string(),
+            });
+        }
+    };
+
+    let (_, similar_users) = collaborative_filtering_recommendations(&all_user_data, &path);
+
+    let response_similar_user: Vec<UserStruct> = similar_users
+        .clone()
+        .into_iter()
+        .map(|(id, similarity)| UserStruct {
+            id: id.to_string(),
+            similarity,
+        })
+        .collect();
+
+    HttpResponse::Ok().json(SuccessResponse {
+        success: true,
+        data: response_similar_user,
+    })
+}
+
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(index)
+        .service(similar_user)
         .service(get_collaborative_filtering_recommendations);
 }
