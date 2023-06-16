@@ -88,17 +88,6 @@ fn calculate_user_similarity(target_user: &UserData, other_user: &UserData) -> f
                 None => "",
             }
         },
-        {
-            let this = target_user
-                .address
-                .as_ref()
-                .map(|address| &address.province);
-            match this {
-                Some(x) => x,
-                None => "",
-            }
-        },
-        target_user.email.as_deref().unwrap_or(""),
     ];
 
     let other_details = [
@@ -127,14 +116,6 @@ fn calculate_user_similarity(target_user: &UserData, other_user: &UserData) -> f
                 None => "",
             }
         },
-        {
-            let this = other_user.address.as_ref().map(|address| &address.province);
-            match this {
-                Some(x) => x,
-                None => "",
-            }
-        },
-        other_user.email.as_deref().unwrap_or(""),
     ];
 
     let details_similarity = cosine_similarity(
@@ -180,7 +161,7 @@ fn calculate_user_similarity(target_user: &UserData, other_user: &UserData) -> f
 
     let similarity_score = (details_similarity + bookings_similarity) / 2.0;
 
-    if similarity_score > 0.4 {
+    if similarity_score > 0.5 {
         similarity_score
     } else {
         0.0
@@ -206,8 +187,6 @@ pub fn collaborative_filtering_recommendations<'a>(
 
             user_similarities.retain(|_, &mut value| value != 0.0);
         }
-
-        println!("User similarities: {:?}", user_similarities);
 
         let similar_users: Vec<&UserData> = users
             .iter()
