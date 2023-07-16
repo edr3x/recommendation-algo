@@ -1,3 +1,3 @@
 # Vehicle Recommendation Algorithm
 
-### trying to implement recommendation algorithm in RUST
+### [DISCLAIMER] this doesn't use NLP, i just implemented this based on data length, little cheeky yeah?, i know but it is just for learning...
